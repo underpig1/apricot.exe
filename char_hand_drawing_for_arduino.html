@@ -1,0 +1,118 @@
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0;
+			}
+
+			.instructions {
+				position: absolute;
+				left: 10px;
+				top: 115px;
+			}
+
+			.key {
+				position: absolute;
+				left: 115px;
+				top: 10px;
+			}
+
+			.key::after {
+				content: "0"
+			}
+
+			.record {
+				position: absolute;
+				left: 10px;
+			}
+
+			#record-x {
+				position: absolute;
+				left: 80px;
+			}
+
+			.x {
+				top: 140px;
+			}
+
+			#record-y {
+				position: absolute;
+				left: 80px;
+			}
+
+			.copy-text {
+				position: absolute;
+				left: 260px;
+			}
+
+			.y {
+				top: 165px;
+			}
+		</style>
+	</head>
+	<body height = 100% width = 100% margin = 0 padding = 0>
+		<canvas id = "canvas" height = 1000 width = 1000></canvas>
+		<label class = "instructions">Press 3 to record, press it again to stop recording. Press 4 to print and reset.</label>
+		<label class = "key">Key: </label>
+		<form class = "record x">X-values: </form><input id = "record-x" class = "x" type = "text" value = "Nothing so far..."><button class = "copy-text x" onclick = "copy_text_x()">Copy</button>
+		<form class = "record y">Y-values: </form><input id = "record-y" class = "y" type = "text" value = "Nothing so far..."><button class = "copy-text y" onclick = "copy_text_y()">Copy</button>
+	</body>
+	<script>
+		var canvas = document.getElementById("canvas")
+		var ctx = canvas.getContext("2d")
+		var width = canvas.width
+		var height = canvas.height
+
+		ctx.strokeStyle = "green"
+		ctx.strokeRect(10, 10, 100, 100)
+
+		var arr = []
+		var key = 1
+		var drawing = 0
+
+		var record_x = document.getElementById("record-x")
+		var record_y = document.getElementById("record-y")
+
+		document.body.onkeydown = () => {
+			if (event.key == 3) {
+				if (drawing == 1) {
+					--drawing
+				}
+				else {
+					++drawing
+				}
+			}
+			if (event.key == 4) {
+				arr = arr.filter((d, i) => i % 3 == 0).map(x => [x[0] - 10, 100 - x[1]])
+				record_x.value = JSON.stringify(arr.map(x => x = x[0]))
+				record_y.value = JSON.stringify(arr.map(x => x = x[1]))
+				arr = []
+				ctx.clearRect(0, 0, width, height)
+				ctx.strokeStyle = "green"
+				ctx.strokeRect(10, 10, 100, 100)
+				document.styleSheets[0].addRule(".key::after", 'content: "'+key+'";');
+				key != 9 ? key += 1 : key = 0
+			}
+		}
+
+		document.body.onmousemove = () => {
+			if (drawing == 1) {
+				arr.push([event.clientX, event.clientY])
+				ctx.strokeStyle = "red"
+				ctx.strokeRect(event.clientX, event.clientY, 1, 1)
+			}
+		}
+
+		function copy_text_x() {
+		  record_x.select()
+		  record_x.setSelectionRange(0, 99999)
+		  navigator.clipboard.writeText(record_x.value)
+		}
+
+		function copy_text_y() {
+		  record_y.select()
+		  record_y.setSelectionRange(0, 99999)
+		  navigator.clipboard.writeText(record_y.value)
+		}
+	</script>
+</html>

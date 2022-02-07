@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0;
+			}
+
+			.instructions {
+				position: absolute;
+				left: 10px;
+				top: 115px;
+			}
+
+			.key {
+				position: absolute;
+				left: 115px;
+				top: 10px;
+			}
+
+			.key::after {
+				content: "0"
+			}
+
+			.record {
+				position: absolute;
+				left: 10px;
+				top: 140px;
+			}
+
+			#record {
+				position: absolute;
+				left: 80px;
+				top: 140px;
+			}
+
+			.copy-text {
+				position: absolute;
+				left: 260px;
+				top: 140px;
+			}
+		</style>
+	</head>
+	<body height = 100% width = 100% margin = 0 padding = 0>
+		<canvas id = "canvas" height = 1000 width = 1000></canvas>
+		<label class = "instructions">Press 3 to record, press it again to stop recording. Press 4 to print and reset.</label>
+		<label class = "key">Key: </label>
+		<form class = "record">Recorded: </form><input id = "record" type = "text" value = "Nothing so far..."><button class = "copy-text" onclick = "copy_text()">Copy</button>
+	</body>
+	<script>
+		var canvas = document.getElementById("canvas")
+		var ctx = canvas.getContext("2d")
+		var width = canvas.width
+		var height = canvas.height
+
+		ctx.strokeStyle = "green"
+		ctx.strokeRect(10, 10, 100, 100)
+
+		var arr = []
+		var key = 1
+		var drawing = 0
+
+		var record = document.getElementById("record")
+
+		document.body.onkeydown = () => {
+			if (event.key == 3) {
+				if (drawing == 1) {
+					--drawing
+				}
+				else {
+					++drawing
+				}
+			}
+			if (event.key == 4) {
+				arr = arr.filter((d, i) => i % 3 == 0).map(x => [x[0] - 10, 100 - x[1]])
+				record.value = JSON.stringify(arr)
+				arr = []
+				ctx.clearRect(0, 0, width, height)
+				ctx.strokeStyle = "green"
+				ctx.strokeRect(10, 10, 100, 100)
+				document.styleSheets[0].addRule(".key::after", 'content: "'+key+'";');
+				key != 9 ? key += 1 : key = 0
+			}
+		}
+
+		document.body.onmousemove = () => {
+			if (drawing == 1) {
+				arr.push([event.clientX, event.clientY])
+				ctx.strokeStyle = "red"
+				ctx.strokeRect(event.clientX, event.clientY, 1, 1)
+			}
+		}
+
+		function copy_text() {
+		  record.select()
+		  record.setSelectionRange(0, 99999)
+		  navigator.clipboard.writeText(record.value)
+		}
+	</script>
+</html>
